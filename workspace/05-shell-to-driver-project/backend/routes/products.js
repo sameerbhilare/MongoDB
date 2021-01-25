@@ -57,13 +57,47 @@ const products = [
 router.get('/', (req, res, next) => {
   // Return a list of dummy products
   // Later, this data will be fetched from MongoDB
+  /*
   const queryPage = req.query.page;
   const pageSize = 5;
   let resultProducts = [...products];
   if (queryPage) {
     resultProducts = products.slice((queryPage - 1) * pageSize, queryPage * pageSize);
   }
-  res.json(resultProducts);
+  */
+
+  // connect to mongodb
+  // 'shop' database will be created on the fly
+  MongoClient.connect(
+    'mongodb+srv://sameer:6hq8UJ5xORPHxCWE@cluster0.zdoxp.mongodb.net/shop?retryWrites=true&w=majority',
+    { useUnifiedTopology: true }
+  )
+    .then((client) => {
+      const products = [];
+      // find
+      client
+        .db()
+        .collection('products')
+        .find()
+        .forEach((productDoc) => {
+          console.log(productDoc);
+          productDoc.price = productDoc.price.toString();
+          products.push(productDoc);
+        })
+        .then((result) => {
+          client.close();
+          res.status(200).json(products);
+        })
+        .catch((err) => {
+          console.log(err);
+          client.close();
+          res.status(500).json({ message: 'An Error occurred' });
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ message: 'An Error occurred' });
+    });
 });
 
 // Get single product
@@ -107,6 +141,7 @@ router.post('', (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
+      res.status(500).json({ message: 'An Error occurred' });
     });
 });
 
