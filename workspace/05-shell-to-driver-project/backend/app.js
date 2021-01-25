@@ -23,19 +23,4 @@ app.use((req, res, next) => {
 app.use('/products', productRoutes);
 app.use('/', authRoutes);
 
-// connect to mongodb
-// 'shop' database will be created on the fly
-mongodb
-  .connect(
-    'mongodb+srv://sameer:6hq8UJ5xORPHxCWE@cluster0.zdoxp.mongodb.net/shop?retryWrites=true&w=majority',
-    { useUnifiedTopology: true }
-  )
-  .then((client) => {
-    console.log('Connected!');
-    client.close();
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
 app.listen(3100);
